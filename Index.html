@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa História</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-pink: #ec4899;
+            --accent-red: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body.locked {
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 20%, rgba(236, 72, 153, 0.12), transparent 70%);
+            z-index: -1;
+        }
+
+        /* Tela Inicial (Necessária para destravar o Autoplay com som nos navegadores) */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .start-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .start-overlay h2 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.8rem;
+            color: var(--accent-pink);
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .start-overlay p {
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-red));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.7);
+        }
+
+        header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        header h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.8rem;
+            color: var(--accent-pink);
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Indicador do Coração que carrega com o Scroll */
+        .heart-progress-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(236, 72, 153, 0.35);
+            padding: 10px 18px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .heart-svg-wrapper {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .heart-svg-wrapper svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Linha do Tempo */
+        .timeline {
+            position: relative;
+            max-width: 850px;
+            margin: 0 auto 100px;
+            padding: 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            background: rgba(236, 72, 153, 0.3);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            width: 50%;
+            padding: 0 40px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            top: 15px;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-color);
+            border-radius: 50%;
+            border: 2px solid var(--accent-pink);
+            box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline-dot svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-pink);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -14px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -14px;
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 22px 25px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-3px);
+            border-color: rgba(236, 72, 153, 0.4);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-desc {
+            font-size: 0.98rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Seção Final Especial (06 de Julho) */
+        .breakup-section {
+            max-width: 850px;
+            margin: 60px auto 140px;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .breakup-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 2px dashed rgba(244, 63, 94, 0.4);
+            border-radius: 24px;
+            padding: 45px 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: border-color 0.8s ease, box-shadow 0.8s ease;
+        }
+
+        .breakup-card.repaired {
+            border: 2px solid var(--accent-pink);
+            box-shadow: 0 10px 50px rgba(236, 72, 153, 0.3);
+        }
+
+        .breakup-icon-large {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 20px;
+        }
+
+        .breakup-icon-large svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.5));
+        }
+
+        .breakup-date {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .breakup-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        /* Pop-up Centralizado: "Desça mais um pouco para continuar... ↓" */
+        .scroll-more-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(15, 23, 42, 0.96);
+            border: 2px solid var(--accent-pink);
+            padding: 28px 36px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            z-index: 2500;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(236, 72, 153, 0.5);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            width: 90%;
+            max-width: 380px;
+        }
+
+        .scroll-more-popup.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .scroll-more-popup .arrow-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(236, 72, 153, 0.2);
+            border: 1px solid rgba(236, 72, 153, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounceDown 1.3s infinite ease-in-out;
+        }
+
+        .scroll-more-popup svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-pink);
+        }
+
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* Imagens e Botão Consertar (Espaçamento para incentivar a rolagem) */
+        .repair-container {
+            display: none;
+            margin-top: 30px;
+            padding-top: 10px;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .repair-images {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .repair-images img {
+            width: 175px;
+            height: 175px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.15);
+            transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .grayscale-img {
+            filter: grayscale(100%) brightness(0.8);
+        }
+
+        /* Destaque especial nas fotos coloridas */
+        .colored-img {
+            filter: grayscale(0%) brightness(1.05);
+            transform: scale(1.1) translateY(-6px);
+            border: 3px solid var(--accent-pink);
+            box-shadow: 0 14px 35px rgba(236, 72, 153, 0.55), 0 0 18px rgba(244, 63, 94, 0.4);
+            z-index: 5;
+        }
+
+        .repair-btn {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-red));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.45);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .repair-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 25px rgba(236, 72, 153, 0.7);
+        }
+
+        /* Mensagem Final Altamente Destacada */
+        .final-message {
+            display: none;
+            margin: 40px auto 10px;
+            max-width: 650px;
+            padding: 28px 32px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(244, 63, 94, 0.25));
+            border: 2px solid var(--accent-pink);
+            border-radius: 20px;
+            line-height: 1.6;
+            text-shadow: 0 2px 12px rgba(236, 72, 153, 0.8);
+            box-shadow: 0 0 35px rgba(236, 72, 153, 0.4), inset 0 0 20px rgba(236, 72, 153, 0.2);
+            animation: popHighlight 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        @keyframes popHighlight {
+            0% { opacity: 0; transform: scale(0.85) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.35), inset 0 0 15px rgba(236, 72, 153, 0.15); }
+            50% { box-shadow: 0 0 50px rgba(236, 72, 153, 0.7), inset 0 0 25px rgba(236, 72, 153, 0.3); }
+        }
+
+        /* Overlay do Coração Grande Quebrado se Consertando */
+        .heart-repair-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 4000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .heart-repair-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .big-heart-stage {
+            width: 220px;
+            height: 220px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .big-heart-stage svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .half-left {
+            transform: translate(-22px, 8px) rotate(-14deg);
+            transform-origin: 50% 80%;
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.8s ease;
+            fill: #64748b;
+        }
+
+        .half-right {
+            transform: translate(22px, 8px) rotate(14deg);
+            transform-origin: 50% 80%;
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.8s ease;
+            fill: #475569;
+        }
+
+        .big-heart-stage.joining .half-left,
+        .big-heart-stage.joining .half-right {
+            transform: translate(0, 0) rotate(0deg);
+            fill: #f43f5e;
+        }
+
+        .big-whole-heart {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 0 35px rgba(236, 72, 153, 0.9));
+        }
+
+        .big-heart-stage.healed .big-whole-heart {
+            opacity: 1;
+            transform: scale(1.18);
+        }
+
+        .big-heart-stage.healed .broken-halves-svg {
+            opacity: 0;
+        }
+
+        .healing-text {
+            margin-top: 25px;
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.6rem;
+            color: var(--accent-pink);
+            text-shadow: 0 2px 15px rgba(236, 72, 153, 0.5);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        .heart-repair-overlay.active .healing-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Modal Bloqueado com Vídeo MP4 e Mensagem "Eu te esperarei" */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .video-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transition: opacity 0.5s ease;
+        }
+
+        .video-notice {
+            color: #f8fafc;
+            font-size: 1.05rem;
+            font-weight: 500;
+            text-align: center;
+            max-width: 400px;
+            margin-bottom: 18px;
+            padding: 12px 20px;
+            background: rgba(236, 72, 153, 0.18);
+            border: 1px solid rgba(236, 72, 153, 0.45);
+            border-radius: 14px;
+            line-height: 1.5;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            animation: pulseNotice 2.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseNotice {
+            0%, 100% { border-color: rgba(236, 72, 153, 0.45); }
+            50% { border-color: rgba(236, 72, 153, 0.9); }
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            background: #000;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(244, 63, 94, 0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .modal-content video {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            display: block;
+        }
+
+        .play-fallback-btn {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(236, 72, 153, 0.95);
+            color: white;
+            border: none;
+            padding: 15px 28px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            z-index: 10;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tela "Eu te esperarei" que aparece dentro do modal antes de voltar à página */
+        .wait-overlay-message {
+            display: none;
+            font-family: 'Great Vibes', cursive;
+            font-size: 4.2rem;
+            color: var(--accent-pink);
+            text-align: center;
+            text-shadow: 0 0 25px rgba(236, 72, 153, 0.8);
+            animation: zoomFadeIn 1s ease forwards;
+            padding: 20px;
+        }
+
+        @keyframes zoomFadeIn {
+            0% { opacity: 0; transform: scale(0.85); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Chuva de Corações SVG */
+        .floating-heart {
+            position: fixed;
+            width: 28px;
+            height: 28px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 9999;
+            animation: riseUp 3.6s ease-in forwards;
+        }
+
+        @keyframes riseUp {
+            0% {
+                transform: translateY(100vh) scale(0.4) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-15vh) scale(1.35) rotate(25deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                width: 100%;
+                padding-left: 55px;
+                padding-right: 0;
+            }
+            .timeline-item:nth-child(odd),
+            .timeline-item:nth-child(even) {
+                left: 0;
+                text-align: left;
+            }
+            .timeline-item:nth-child(odd) .timeline-dot,
+            .timeline-item:nth-child(even) .timeline-dot {
+                left: 6px;
+                right: auto;
+            }
+            header h1, .start-overlay h2 {
+                font-size: 3rem;
+            }
+            .wait-overlay-message {
+                font-size: 3.2rem;
+            }
+            .final-message {
+                font-size: 1.25rem;
+                padding: 22px 20px;
+            }
+            .repair-images img {
+                width: 145px;
+                height: 145px;
+            }
+        }
+    </style>
+</head>
+<body class="locked">
+
+    <!-- Tela de Entrada (Desbloqueia o autoplay do vídeo com som) -->
+    <div class="start-overlay" id="startOverlay">
+        <h2>Nossa História</h2>
+        <p>Preparei cada lembrança com muito carinho. Ligue o som e role a página devagar...</p>
+        <button class="start-btn" onclick="startExperience()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            Começar
+        </button>
+    </div>
+
+    <!-- Pop-up no Meio da Tela: "Desça mais um pouco para continuar... ↓" -->
+    <div class="scroll-more-popup" id="scrollMorePopup" onclick="scrollToPhotos()">
+        <span>Desça mais um pouco para continuar... ↓</span>
+        <div class="arrow-circle">
+            <svg viewBox="0 0 24 24">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Indicador de Coração que Enche com o Scroll -->
+    <div class="heart-progress-container">
+        <div class="heart-svg-wrapper" id="topHeartWrapper">
+            <svg id="wholeHeartSvg" viewBox="0 0 24 24">
+                <defs>
+                    <linearGradient id="heartFillGrad" x1="0" y1="1" x2="0" y2="0">
+                        <stop id="gradStop1" offset="0%" stop-color="#f43f5e" />
+                        <stop id="gradStop2" offset="0%" stop-color="rgba(255,255,255,0.15)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#heartFillGrad)" stroke="#f43f5e" stroke-width="1.5" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+
+            <svg id="brokenHeartSvg" viewBox="0 0 24 24" style="display: none;">
+                <path fill="#64748b" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09L10 9l3 3-2 4 1 5.35z"/>
+                <path fill="#475569" d="M12 21.35l1-5.35 2-4-3-3 2-3.91C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" transform="translate(1.5, 0.5) rotate(6 12 12)"/>
+            </svg>
+        </div>
+        <span class="progress-text" id="progressText">0%</span>
+    </div>
+
+    <header>
+        <h1>Nossa Linha do Tempo</h1>
+        <p>Cada momento ao seu lado foi inesquecível...</p>
+    </header>
+
+    <!-- Linha do Tempo -->
+    <div class="timeline" id="timelineContainer">
+        <!-- 1 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">1 de Dezembro de 2025</div>
+                <div class="timeline-desc">Dia que a gente se conheceu, olhei pra você e achei que cê era uma pessoa incrível, e descobri que eu realmente não estava errado...</div>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">4 de Dezembro de 2025</div>
+                <div class="timeline-desc">Primeira vez que a gente conversou no WhatsApp, não sabia que eu ia gostar tanto de conversar com uma pessoa e só me deixava ainda mais apaixonado.</div>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">28 de Dezembro de 2025</div>
+                <div class="timeline-desc">A primeira mensagem "grande" que eu te mandei, e o primeiro sinal que eu te dei sobre fazer a surpresa do pedido de namoro ksksks.</div>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">1 de Janeiro de 2026</div>
+                <div class="timeline-desc">"Primeiro plano" nosso, ir à praia em Salvador no final do ano para ver o ano novo.</div>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">11 de Janeiro de 2026</div>
+                <div class="timeline-desc">Primeira vez que fui na sua casa, para conhecer seus pais, fiquei muito nervoso, mas deu certo.</div>
+            </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">28 de Janeiro de 2026</div>
+                <div class="timeline-desc">Primeira vez que você veio na minha casa, primeira tarde juntos e também a primeira vez que a gente se beijou.</div>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">2 de Fevereiro de 2026</div>
+                <div class="timeline-desc">Nosso primeiro encontro, a gente foi para o Subway depois das suas aulas.</div>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">6 de Fevereiro de 2026</div>
+                <div class="timeline-desc">O momento especial, muito especial para mim, o momento da surpresa, o momento que eu te pedi em namoro.</div>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">6 de Março de 2026</div>
+                <div class="timeline-desc">Primeira vez que eu fui na casa de sua avó e a gente passou um final de semana inteiro juntos, assistimos a uma série juntos e ficamos deitados juntos. Foi muito especial pra mim.</div>
+            </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">3 de Abril de 2026</div>
+                <div class="timeline-desc">Primeira vez que você foi na casa da minha avó e foi quando cê conheceu minha família materna quase toda kkkkk.</div>
+            </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">08 de Maio de 2026</div>
+                <div class="timeline-desc">Segundo final de semana que eu passei contigo, quando eu conheci suas tias, Lyse, Sophia.</div>
+            </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="timeline-item">
+            <div class="timeline-dot">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-date">19 de Junho de 2026</div>
+                <div class="timeline-desc">Primeira vez que participamos de um retiro juntos, primeira vez que te dei um buquê e terceiro fim de semana que eu passei contigo.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção Final: 06 de Julho -->
+    <div class="breakup-section" id="breakupSection">
+        <div class="breakup-card" id="breakupCard">
+            <!-- Ícone grande central -->
+            <div class="breakup-icon-large">
+                <svg id="cardBrokenHeart" viewBox="0 0 24 24">
+                    <path fill="#f43f5e" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09L10 9l3 3-2 4 1 5.35z"/>
+                    <path fill="#e11d48" d="M12 21.35l1-5.35 2-4-3-3 2-3.91C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" transform="translate(2, 0.5) rotate(8 12 12)"/>
+                </svg>
+                <svg id="cardFixedHeart" viewBox="0 0 24 24" style="display: none;">
+                    <path fill="#ec4899" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+
+            <div class="breakup-date" id="breakupDate">06 de Julho</div>
+            <div class="breakup-title" id="breakupTitle">Terminamos…</div>
+
+            <!-- Fotos em escala de cinza e botão Consertar -->
+            <div class="repair-container" id="repairContainer">
+                <div class="repair-images">
+                    <img src="foto1.jpeg" alt="Nós 1" class="grayscale-img" id="img1">
+                    <img src="foto2.jpeg" alt="Nós 2" class="grayscale-img" id="img2">
+                    <img src="foto3.jpeg" alt="Nós 3" class="grayscale-img" id="img3">
+                </div>
+                <button class="repair-btn" id="repairBtn" onclick="repairRelationship()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    Clique aqui
+                </button>
+            </div>
+
+            <!-- Mensagem Final Destacada -->
+            <div class="final-message" id="finalMessage">
+                Mas saiba que, independente de sua escolha, eu sempre vou te amar.
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay da Animação do Coração Grande Quebrado se Consertando -->
+    <div class="heart-repair-overlay" id="heartRepairOverlay">
+        <div class="big-heart-stage" id="bigHeartStage">
+            <svg class="broken-halves-svg" viewBox="0 0 24 24">
+                <path class="half-left" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09L10 9l3 3-2 4 1 5.35z"/>
+                <path class="half-right" d="M12 21.35l1-5.35 2-4-3-3 2-3.91C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <svg class="big-whole-heart" viewBox="0 0 24 24">
+                <path fill="#ec4899" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </div>
+        <div class="healing-text" id="healingText">Reparando...</div>
+    </div>
+
+    <!-- Modal Bloqueado com Vídeo MP4 e Mensagem Pós-Vídeo -->
+    <div class="modal-overlay" id="videoModal">
+        <!-- Etapa 1 do Modal: Aviso + Vídeo -->
+        <div class="video-stage" id="videoStage">
+            <div class="video-notice">
+                Por favor, espere o vídeo terminar porque ainda não é o fim
+            </div>
+
+            <div class="modal-content">
+                <video id="popupVideo" playsinline preload="auto">
+                    <source src="video.mp4" type="video/mp4">
+                    Seu navegador não suporta vídeos em MP4.
+                </video>
+                <button class="play-fallback-btn" id="playFallbackBtn" onclick="forcePlayVideo()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    Tocar Vídeo
+                </button>
+            </div>
+        </div>
+
+        <!-- Etapa 2 do Modal: Aparece "Eu te esperarei" ANTES de voltar para a tela da página -->
+        <div class="wait-overlay-message" id="waitOverlayMessage">
+            Eu te esperarei
+        </div>
+    </div>
+
+    <script>
+        const popupVideo = document.getElementById('popupVideo');
+        const startOverlay = document.getElementById('startOverlay');
+        const videoModal = document.getElementById('videoModal');
+        const videoStage = document.getElementById('videoStage');
+        const waitOverlayMessage = document.getElementById('waitOverlayMessage');
+        const playFallbackBtn = document.getElementById('playFallbackBtn');
+        const wholeHeartSvg = document.getElementById('wholeHeartSvg');
+        const brokenHeartSvg = document.getElementById('brokenHeartSvg');
+        const gradStop1 = document.getElementById('gradStop1');
+        const gradStop2 = document.getElementById('gradStop2');
+        const progressText = document.getElementById('progressText');
+        const breakupSection = document.getElementById('breakupSection');
+        const scrollMorePopup = document.getElementById('scrollMorePopup');
+        const repairContainer = document.getElementById('repairContainer');
+        const finalMessage = document.getElementById('finalMessage');
+
+        let isBroken = false;
+        let isRepaired = false;
+        let videoTriggered = false;
+        let waitingForScrollAfterVideo = false;
+        let scrollBaseline = 0;
+
+        // 1. Destrava o vídeo com som quando clica em "Começar"
+        function startExperience() {
+            startOverlay.classList.add('hidden');
+            document.body.classList.remove('locked');
+
+            popupVideo.muted = true;
+            popupVideo.play().then(() => {
+                popupVideo.pause();
+                popupVideo.currentTime = 0;
+                popupVideo.muted = false;
+            }).catch(err => {
+                console.log("Pré-carregamento silencioso:", err);
+            });
+        }
+
+        // 2. Carrega o preenchimento do coração e fecha o pop-up de "Desça mais um pouco" quando ela rolar a tela
+        window.addEventListener('scroll', () => {
+            if (waitingForScrollAfterVideo && window.scrollY > scrollBaseline + 40) {
+                waitingForScrollAfterVideo = false;
+                scrollMorePopup.classList.remove('active');
+            }
+
+            if (isBroken || isRepaired) return;
+
+            const scrollTop = window.scrollY;
+            const targetOffset = breakupSection.offsetTop - window.innerHeight * 0.6;
+            let percent = Math.min(100, Math.max(0, Math.round((scrollTop / targetOffset) * 100)));
+
+            gradStop1.setAttribute('offset', percent + '%');
+            gradStop2.setAttribute('offset', percent + '%');
+            progressText.textContent = percent + '%';
+        });
+
+        // Caso ela clique direto no pop-up "Desça mais um pouco", desce suavemente até as fotos
+        function scrollToPhotos() {
+            waitingForScrollAfterVideo = false;
+            scrollMorePopup.classList.remove('active');
+            repairContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // 3. Animação de aparecer os itens da timeline
+        const itemObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            itemObserver.observe(item);
+        });
+
+        // 4. Gatilho quando chega em 06 de Julho
+        const breakupObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !videoTriggered) {
+                    videoTriggered = true;
+                    triggerBreakupEvent();
+                }
+            });
+        }, { threshold: 0.55 });
+
+        breakupObserver.observe(breakupSection);
+
+        function triggerBreakupEvent() {
+            isBroken = true;
+
+            wholeHeartSvg.style.display = 'none';
+            brokenHeartSvg.style.display = 'block';
+            progressText.textContent = '06 de Julho';
+
+            document.body.classList.add('locked');
+            videoModal.classList.add('active');
+            popupVideo.currentTime = 0;
+            popupVideo.muted = false;
+
+            const playPromise = popupVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    playFallbackBtn.style.display = 'inline-flex';
+                });
+            }
+
+            // Quando o vídeo termina:
+            popupVideo.onended = () => {
+                // Passo 1: Esconde o vídeo e mostra "Eu te esperarei" ainda na tela escura do pop-up
+                videoStage.style.display = 'none';
+                waitOverlayMessage.style.display = 'block';
+
+                // Passo 2: Após 3 segundos lendo "Eu te esperarei", fecha o pop-up do vídeo e abre o pop-up "Desça mais um pouco..." no meio da tela
+                setTimeout(() => {
+                    videoModal.classList.remove('active');
+                    document.body.classList.remove('locked');
+                    repairContainer.style.display = 'block';
+
+                    scrollBaseline = window.scrollY;
+                    waitingForScrollAfterVideo = true;
+                    scrollMorePopup.classList.add('active');
+                }, 3000);
+            };
+        }
+
+        function forcePlayVideo() {
+            playFallbackBtn.style.display = 'none';
+            popupVideo.muted = false;
+            popupVideo.play();
+        }
+
+        // 5. Sequência ao clicar no botão "Consertar"
+        function repairRelationship() {
+            isRepaired = true;
+            isBroken = false;
+
+            document.getElementById('repairBtn').style.display = 'none';
+            scrollMorePopup.classList.remove('active');
+
+            const heartOverlay = document.getElementById('heartRepairOverlay');
+            const bigStage = document.getElementById('bigHeartStage');
+            const healingText = document.getElementById('healingText');
+
+            // Passo A: Abre a tela mostrando o Coração Grande Quebrado
+            heartOverlay.classList.add('active');
+
+            // Passo B: As metades do coração se unem
+            setTimeout(() => {
+                bigStage.classList.add('joining');
+            }, 500);
+
+            // Passo C: O coração se restaura por completo com brilho e vários corações começam a subir
+            setTimeout(() => {
+                bigStage.classList.add('healed');
+                healingText.textContent = 'Coração Recuperado ❤️';
+                startFloatingHearts();
+
+                brokenHeartSvg.style.display = 'none';
+                wholeHeartSvg.style.display = 'block';
+                gradStop1.setAttribute('offset', '100%');
+                gradStop2.setAttribute('offset', '100%');
+                progressText.textContent = '100%';
+
+                document.getElementById('cardBrokenHeart').style.display = 'none';
+                document.getElementById('cardFixedHeart').style.display = 'block';
+                document.getElementById('breakupCard').classList.add('repaired');
+            }, 1700);
+
+            // Passo D: Fecha o overlay do coração grande e dá destaque nas 3 fotos coloridas uma por uma
+            setTimeout(() => {
+                heartOverlay.classList.remove('active');
+
+                setTimeout(() => {
+                    document.getElementById('img1').classList.replace('grayscale-img', 'colored-img');
+                }, 250);
+
+                setTimeout(() => {
+                    document.getElementById('img2').classList.replace('grayscale-img', 'colored-img');
+                }, 650);
+
+                setTimeout(() => {
+                    document.getElementById('img3').classList.replace('grayscale-img', 'colored-img');
+                }, 1050);
+
+                // Passo E: Exibe a mensagem final destacada e solta mais uma onda de corações
+                setTimeout(() => {
+                    finalMessage.style.display = 'block';
+                    finalMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    startFloatingHearts();
+                }, 1600);
+
+            }, 3100);
+        }
+
+        function startFloatingHearts() {
+            for (let i = 0; i < 45; i++) {
+                setTimeout(() => {
+                    createFloatingHeart();
+                }, i * 80);
+            }
+        }
+
+        function createFloatingHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.innerHTML = `<svg viewBox="0 0 24 24" fill="#ec4899" style="width:100%; height:100%; filter: drop-shadow(0 0 6px rgba(236,72,153,0.6));">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>`;
+            heart.style.left = Math.random() * 95 + 'vw';
+            const size = 20 + Math.random() * 22;
+            heart.style.width = size + 'px';
+            heart.style.height = size + 'px';
+            heart.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 4500);
+        }
+    </script>
+</body>
+</html>
